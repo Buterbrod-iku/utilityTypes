@@ -1,31 +1,26 @@
 import './App.css'
-import {useEffect, useRef} from "react";
-import {imageUrls} from "./images.ts";
+import React, { useState} from "react";
+import {VanillaLoad} from "./components/VanillaLoad/VanillaLoad.tsx";
+import {WorkerLoad} from "./components/WorkerLoad/WorkerLoad.tsx";
 
 function App() {
-    const containerRef: any = useRef()
+    const [isVanilla, setIsVanilla] = useState(false);
 
-    useEffect(() => {
-        if (containerRef.current) {
-            let images = ''
-
-            for (let i = 0; i < imageUrls.length; i++) {
-                images += `<img src="${imageUrls[i]}" />`
-            }
-
-            containerRef.current.innerHTML = images
-
-            console.log(images)
-        }
-        console.log(imageUrls)
-    }, []);
+    const handleChangePage = () => {
+        setIsVanilla((old) => !old);
+    };
 
   return (
-    <>
-        <h1>wiehyiqweu</h1>
+      <>
+          <h1>Worker</h1>
 
-        <div ref={containerRef} />
-    </>
+          <button type='button' onClick={handleChangePage}>
+              {isVanilla ?  'Load Vanilla' : 'Load with WorkerLoad'}
+          </button>
+
+          {isVanilla ? <VanillaLoad /> : <WorkerLoad />}
+
+      </>
   )
 }
 

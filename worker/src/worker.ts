@@ -1,48 +1,23 @@
-/* global createImageBitmap */
+self.onmessage = function (e) {
+    const urls = e.data;
+    const loadedImages = [];
+    let loadedCount = 0;
 
-function loadImageWithImageTag(src) {
-    return new Promise((resolve, reject) => {
-        const img = new Image;
-        img.crossOrigin = '';
-        img.src = src;
-        img.onload = () => { resolve(img); };
-        img.onerror = () => { reject(img); };
-    });
-}
-
-function createWorker(f) {
-    return new Worker(URL.createObjectURL(new Blob([`(${f})()`])));
-}
-
-const worker = createWorker(() => {
-    self.addEventListener('message', e => {
-        const src = e.data;
-        fetch(src, { mode: 'cors' })
+    for (let i = 0; i < 500; i++) {
+        fetch(`https://picsum.photos/200/300?random=${i}`)
             .then(response => response.blob())
-            .then(blob => createImageBitmap(blob))
-            .then(bitmap => {
-                self.postMessage({ src, bitmap }, [bitmap]);
+            .then(blob => {
+                loadedImages.push(URL.createObjectURL(blob));
+                loadedCount++;
+
+                self.postMessage({ progress: (loadedCount / 500) * 100 });
+
+                if (loadedCount === 500) {
+                    self.postMessage({ images: loadedImages });
+                }
+            })
+            .catch(error => {
+                console.error('Ошибка загрузки:', error);
             });
-    });
-});
-
-function loadImageWithWorker(src) {
-    return new Promise((resolve) => {
-        function handler(e) {
-            if (e.data.src === src) {
-                worker.removeEventListener('message', handler);
-                resolve(e.data.bitmap);
-            }
-        }
-        worker.addEventListener('message', handler);
-        worker.postMessage(src);
-    });
-}
-
-// const loader = loadImageWithImageTag;
-const loader = loadImageWithWorker;
-
-loader('https://i.imgur.com/NTBhJwl.jpg').then(img => {
-    const ctx = document.querySelector('canvas').getContext('2d');
-    ctx.drawImage(img, 0, 0, ctx.canvas.width, ctx.canvas.height);
-});
+    }
+};
