@@ -1,5 +1,5 @@
 вставка изображений просто напрямую 
-``
+
 useEffect(() => {
         if (containerRef.current) {
             let images = ''
@@ -14,5 +14,5 @@ useEffect(() => {
         }
         console.log(imageUrls)
     }, []);
-``
+
 ![image](https://github.com/user-attachments/assets/fa7d1284-1fed-4768-b5c6-c3cae8325338)
